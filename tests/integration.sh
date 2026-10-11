@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-readonly ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly FIREWALL_SCRIPT="$ROOT_DIR/configs/netfilter-hardening.sh"
-readonly TEMP_DIR="$(mktemp -d)"
+TEMP_DIR="$(mktemp -d)"
+readonly ROOT_DIR TEMP_DIR
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
 fail() {
