@@ -1,4 +1,4 @@
-# Origin Cloaking & Secure Edge Ingress
+# Cloud Edge Ingress & Origin Hardening
 
 An open-source reference architecture and Linux host baseline for protecting an Internet-facing application behind Cloudflare and Oracle Cloud Infrastructure (OCI) network controls.
 
