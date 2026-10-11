@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   shell:
-    name: Bash syntax and ShellCheck
+    name: Bash, ShellCheck, and firewall integration
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -20,6 +20,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes shellcheck
       - name: Check Bash syntax
-        run: bash -n configs/netfilter-hardening.sh
+        run: make check
       - name: Run ShellCheck
-        run: shellcheck --shell=bash --severity=style configs/netfilter-hardening.sh
+        run: make lint
+      - name: Run firewall integration tests
+        run: make test
