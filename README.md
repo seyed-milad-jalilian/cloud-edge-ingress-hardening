@@ -138,7 +138,7 @@ shellcheck --shell=bash --severity=style configs/netfilter-hardening.sh
 ## Repository Contents
 
 | Path | Purpose |
-| --- | --- |
+| :--- | :--- |
 | `configs/netfilter-hardening.sh` | Configurable dual-stack host firewall baseline |
 | `configs/sysctl-tuning.conf` | Linux TCP tuning and origin-host forwarding policy |
 | `assets/edge-network-traffic.svg` | Origin-ingress reference architecture |
