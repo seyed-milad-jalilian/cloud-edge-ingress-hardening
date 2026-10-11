@@ -24,6 +24,15 @@ assert_stateful_rule() {
     <<< "$rules" || fail "missing established/related conntrack rule"
 }
 
+assert_tcp_allow_rule() {
+  local table="$1"
+  local source_cidr="$2"
+  local destination_port="$3"
+  "$table" -C UER-INPUT -p tcp -s "$source_cidr" --dport "$destination_port" \
+    -m conntrack --ctstate NEW -j ACCEPT \
+    || fail "missing $table TCP allow rule for $source_cidr:$destination_port"
+}
+
 expect_failure() {
   local description="$1"
   shift
@@ -76,21 +85,21 @@ ipv4_rules="$(iptables -S UER-INPUT)"
 assert_rule "$ipv4_rules" "-A UER-INPUT -i lo -j ACCEPT"
 assert_stateful_rule "$ipv4_rules"
 assert_rule "$ipv4_rules" "-A UER-INPUT -p icmp -j ACCEPT"
-assert_rule "$ipv4_rules" "-A UER-INPUT -p tcp -s 192.0.2.10/32 --dport 2222 -m conntrack --ctstate NEW -j ACCEPT"
-assert_rule "$ipv4_rules" "-A UER-INPUT -p tcp -s 192.0.2.20/32 --dport 2222 -m conntrack --ctstate NEW -j ACCEPT"
-assert_rule "$ipv4_rules" "-A UER-INPUT -p tcp -s 198.51.100.0/24 --dport 443 -m conntrack --ctstate NEW -j ACCEPT"
-assert_rule "$ipv4_rules" "-A UER-INPUT -p tcp -s 203.0.113.0/24 --dport 443 -m conntrack --ctstate NEW -j ACCEPT"
 assert_rule "$ipv4_rules" "-A UER-INPUT -j DROP"
+assert_tcp_allow_rule iptables 192.0.2.10/32 2222
+assert_tcp_allow_rule iptables 192.0.2.20/32 2222
+assert_tcp_allow_rule iptables 198.51.100.0/24 443
+assert_tcp_allow_rule iptables 203.0.113.0/24 443
 
 ipv6_rules="$(ip6tables -S UER-INPUT)"
 assert_rule "$ipv6_rules" "-A UER-INPUT -i lo -j ACCEPT"
 assert_stateful_rule "$ipv6_rules"
 assert_rule "$ipv6_rules" "-A UER-INPUT -p ipv6-icmp -j ACCEPT"
-assert_rule "$ipv6_rules" "-A UER-INPUT -p tcp -s 2001:db8::10/128 --dport 2222 -m conntrack --ctstate NEW -j ACCEPT"
-assert_rule "$ipv6_rules" "-A UER-INPUT -p tcp -s 2001:db8::20/128 --dport 2222 -m conntrack --ctstate NEW -j ACCEPT"
-assert_rule "$ipv6_rules" "-A UER-INPUT -p tcp -s 2001:db8:100::/48 --dport 443 -m conntrack --ctstate NEW -j ACCEPT"
-assert_rule "$ipv6_rules" "-A UER-INPUT -p tcp -s 2001:db8:200::/48 --dport 443 -m conntrack --ctstate NEW -j ACCEPT"
 assert_rule "$ipv6_rules" "-A UER-INPUT -j DROP"
+assert_tcp_allow_rule ip6tables 2001:db8::10/128 2222
+assert_tcp_allow_rule ip6tables 2001:db8::20/128 2222
+assert_tcp_allow_rule ip6tables 2001:db8:100::/48 443
+assert_tcp_allow_rule ip6tables 2001:db8:200::/48 443
 
 assert_rule "$(iptables -S INPUT)" "-P INPUT DROP"
 assert_rule "$(iptables -S FORWARD)" "-P FORWARD DROP"
