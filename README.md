@@ -75,6 +75,7 @@ Export comma-separated CIDR allow-lists. The sample IPv4 ranges are reserved doc
 ```bash
 export SSH_ADMIN_IPV4_CIDRS="198.51.100.25/32"
 export EDGE_PROXY_IPV4_CIDRS="203.0.113.0/24"
+
 export SSH_ADMIN_IPV6_CIDRS=""
 export EDGE_PROXY_IPV6_CIDRS=""
 
@@ -126,14 +127,17 @@ Verify firewall policies, SSH access, and effective sysctl values after rollback
 
 ## CI/CD Quality Controls
 
-The GitHub Actions workflow at `.github/workflows/validate.yml` runs on pushes, pull requests, and manual dispatch. It checks Bash syntax with `bash -n` and performs static analysis with ShellCheck. These quality gates detect shell issues; deployment-specific OCI, Cloudflare, and live-traffic validation remains part of the environment's release procedure.
+The GitHub Actions workflow at `.github/workflows/validate.yml` runs on pushes, pull requests, and manual dispatch. It runs the same `make check`, `make lint`, and `make test` targets available to contributors locally. Integration tests run in a disposable Ubuntu Docker container with only `NET_ADMIN` added; they exercise the actual IPv4 and IPv6 firewall rules, validation failures, check-mode non-mutation, default policies, and idempotent chain hooks. Deployment-specific OCI, Cloudflare, and live-traffic validation remains part of the environment's release procedure.
 
 Run the checks locally:
 
 ```bash
-bash -n configs/netfilter-hardening.sh
-shellcheck --shell=bash --severity=style configs/netfilter-hardening.sh
+make check
+make lint
+make test
 ```
+
+`make lint` requires ShellCheck. `make test` requires Docker; it installs `iptables` inside the isolated test container and does not change the host firewall.
 
 ## Repository Contents
 
@@ -143,6 +147,8 @@ shellcheck --shell=bash --severity=style configs/netfilter-hardening.sh
 | `configs/sysctl-tuning.conf` | Linux TCP tuning and origin-host forwarding policy |
 | `assets/edge-network-traffic.svg` | Origin-ingress reference architecture |
 | `.github/workflows/validate.yml` | Bash syntax and ShellCheck quality gates |
+| `tests/integration.sh` | Isolated IPv4/IPv6 firewall integration tests |
+| `Makefile` | Local lint, syntax-check, and integration-test targets |
 
 ## License
 
