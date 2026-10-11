@@ -122,9 +122,10 @@ ensure_chain() {
 
 ensure_input_hook() {
   local command_name="$1"
-  if ! "$command_name" -C INPUT -j "$CHAIN" >/dev/null 2>&1; then
-    "$command_name" -I INPUT 1 -j "$CHAIN"
-  fi
+  while "$command_name" -C INPUT -j "$CHAIN" >/dev/null 2>&1; do
+    "$command_name" -D INPUT -j "$CHAIN"
+  done
+  "$command_name" -I INPUT 1 -j "$CHAIN"
 }
 
 ensure_chain iptables

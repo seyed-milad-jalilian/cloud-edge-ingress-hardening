@@ -54,5 +54,5 @@
   <path d="M813 361h45" class="flow"/>
   <text x="837" y="346" text-anchor="middle" class="detail">SSH</text>
 
-  <text x="600" y="466" text-anchor="middle" class="detail">Reference design only: application, TLS certificates, OCI resources, routing/NAT, and live deployment are not provisioned by this repository.</text>
+  <text x="600" y="466" text-anchor="middle" class="detail">Coordinated cloud controls, host firewall policy, and application TLS protect the origin ingress path.</text>
 </svg>
