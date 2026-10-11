@@ -29,16 +29,21 @@ elif [[ $# -ne 0 ]]; then
 fi
 
 [[ "$(id -u)" -eq 0 ]] || die "run as root (for example, with sudo)"
-[[ "$SSH_PORT" =~ ^[0-9]+$ ]] && (( SSH_PORT >= 1 && SSH_PORT <= 65535 )) \
-  || die "SSH_PORT must be an integer between 1 and 65535"
+if [[ ! "$SSH_PORT" =~ ^[0-9]+$ ]] || (( SSH_PORT < 1 || SSH_PORT > 65535 )); then
+  die "SSH_PORT must be an integer between 1 and 65535"
+fi
 
 for command_name in iptables ip6tables iptables-restore ip6tables-restore mktemp; do
   command -v "$command_name" >/dev/null 2>&1 || die "required command not found: $command_name"
 done
 
 declare -a SSH_ADMIN_IPV4=()
+# Referenced by name through the load_cidrs and write_ruleset namerefs.
+# shellcheck disable=SC2034
 declare -a SSH_ADMIN_IPV6=()
 declare -a EDGE_PROXY_IPV4=()
+# Referenced by name through the load_cidrs and write_ruleset namerefs.
+# shellcheck disable=SC2034
 declare -a EDGE_PROXY_IPV6=()
 
 load_cidrs() {
